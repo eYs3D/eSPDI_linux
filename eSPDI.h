@@ -2832,4 +2832,14 @@ int APC_PostProcess(void *pPostProcessHandle, unsigned char *pDepthData);
     \return success: APC_OK, others: see eSPDI_def.h
  */
 int APC_ReleasePostProcess(void *pPostProcessHandle);
+
+/*! \fn int APC_SetRootCipher(void *pHandleEYSD, PDEVSELINFO pDevSelInfo, const char* cipher)
+    \brief Set the correct root to do un-protect flash when writing parameters of camera.
+    \param void *pHandleEYSD	 the pointer to the initilized EYSD SDK instance
+    \param PDEVSELINFO pDevSelInfo	pointer of device select index
+    \param const char* cipher  root
+    \return success: APC_OK, others: see eSPDI_def.h
+*/
+int APC_SetRootCipher(void *pHandleEYSD, PDEVSELINFO pDevSelInfo, const char* cipher);
+
 #endif // LIB_ESPDI_H

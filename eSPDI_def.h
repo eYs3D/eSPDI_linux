@@ -247,21 +247,9 @@ typedef enum {
 #define APC_USER_DATA_FILE_SIZE_1			4096
 #define APC_BACKUP_USER_DATA_FILE_ID        201
 #define APC_BACKUP_USER_DATA_SIZE           1024
-// for Flash Read/Write -
 
-/*
-    The group 1 is the factory settings which are calibrated before shipment.
-    The group 2 is the factory settings after post calibration.
-    FW Register 0xF6 is the offset.
-    The default offset is set as 5 which means 10 divided by 2 groups.
-*/
-#define APC_MD5_CHECKSUM_SIZE				32
-#define APC_USER_SETTING_OFFSET				5
-#define APC_USER_SETTING_RANGE				10
-#define FW_PROTECT_STRUCT_LEN_OF_STI        17
-#define FW_UNPROTECT_STRUCT_LEN_OF_STI      11
-#define FW_UNKNOWN_STRUCT_LEN_OF_STI        255
-#define FW_UNKNOWN_UNPAREASTARTSEC          (-1)
+
+
 
 // for device information +
 typedef struct tagDEVINFORMATION {
@@ -306,6 +294,8 @@ typedef struct tagDEVINFORMATION {
 #define APC_PID_HYPATIA 0x0160
 #define APC_PID_HYPATIA2 0x0173
 #define APC_PID_8062    0x0162
+#define APC_PID_8063     0x0164
+#define APC_PID_8063_K   0x0165
 #define APC_PID_IVY     0x0177
 #define APC_PID_GRAP    0x0179
 #define APC_PID_GRAP_K  0x0183
@@ -778,6 +768,14 @@ struct APCImageType
         }
     }
 };
+/**
+ * @param M_dst input camera matrix of RGB-lens, including intrinsic parameters, such as RectifyLog-CamMat2 (M3).
+ *              The buffer size is 9.
+ * @param R_dst_to_src input rotation matrix of dst-lens to src-lens, dst is the camera at left side, src is the camera at
+ *                     right side, such as RectifyLog-RotaMat (R31). The buffer size is 9.
+ * @param T_dst_to_src  input translation matrix of dst-lens to src-lens, such as RectifyLog-TranMat (T13).
+ *                     The buffer size is 3.
+ */
 
 struct PointCloudInfo
 {
@@ -788,10 +786,13 @@ struct PointCloudInfo
     float disparityToW[ 2048 ];
     int   disparity_len;
     WORD  wDepthType;
-//multi-lens data
+    int depth_image_edian; //0: lillte-edian, 1: big-edia
+    //multi-lens data
     float focalLength_K;
     float baseline_K;
     float diff_K;
-    int depth_image_edian; //0: lillte-edian, 1: big-edia
+    float slaveDeviceCamMat2[9];
+    float slaveDeviceRotaMat[9];
+    float slaveDeviceTranMat[3];
 };
 #endif // LIB_ESPDI_DEF_H
