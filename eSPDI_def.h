@@ -13,6 +13,20 @@
 #ifndef LIB_ESPDI_DEF_H
 #define LIB_ESPDI_DEF_H
 
+#ifdef TINY_VERSION
+#define MAX_DEV_COUNT 6
+#else
+#ifdef X86_CONSOLE
+#define MAX_DEV_COUNT 200
+#else
+#define MAX_DEV_COUNT 20//200 //EthanWu-20200609: modify to 20
+#endif
+#endif
+//Composite devices +  Simple devices
+#define MAX_TOTAL_DEV_CONT          (MAX_DEV_COUNT * 2 + MAX_DEV_COUNT)
+//The start index of Simpe device in g_pVideoDev
+#define SIMPLE_DEV_START_IDX        (MAX_TOTAL_DEV_CONT - (MAX_DEV_COUNT))
+
 //define Error Code by Wolf 2015/08/07 +
 #define  APC_OK                        0
 #define  APC_NoDevice                 -1
@@ -50,7 +64,7 @@
 #define  APC_DEVICE_BUSY		     -33
 #define  APC_DEVICE_TIMEOUT		     -34
 #define  APC_IO_SELECT_EINTR	     -35
-#define APC_IO_SELECT_ERROR          -36
+#define  APC_IO_SELECT_ERROR         -36
 
 // for 3D Scanner +    
 #define  APC_ILLEGAL_ANGLE                -40
@@ -248,9 +262,6 @@ typedef enum {
 #define APC_BACKUP_USER_DATA_FILE_ID        201
 #define APC_BACKUP_USER_DATA_SIZE           1024
 
-
-
-
 // for device information +
 typedef struct tagDEVINFORMATION {
   unsigned short wPID;
@@ -296,20 +307,27 @@ typedef struct tagDEVINFORMATION {
 #define APC_PID_8062    0x0162
 #define APC_PID_8063     0x0164
 #define APC_PID_8063_K   0x0165
+#define APC_PID_8076    0x0181
 #define APC_PID_IVY     0x0177
 #define APC_PID_GRAP    0x0179
 #define APC_PID_GRAP_K  0x0183
 #define APC_PID_GRAP_SLAVE   0x0279
 #define APC_PID_GRAP_SLAVE_K 0x0283
-#define APC_PID_SANDRA  0x0167
-#define APC_PID_NORA  0x0168 //NOTE: http://redmine.etron.com.tw/redmine/issues/6688#change-36410
-#define APC_PID_HELEN  0x0171 //NOTE: http://redmine.etron.com.tw/redmine/issues/6649#note-50
+
 //+[Thermal device]
 #define APC_PID_GRAP_THERMAL 0xf9f9
 #define APC_PID_GRAP_THERMAL2 0xf8f8
+
+//+[MIPI Camera]
+#define APC_PID_MIPI_8036 (APC_PID_8036 | 0xf000) 
+#define APC_PID_NORA  0x0168 //NOTE: http://redmine.etron.com.tw/redmine/issues/6688#change-36410
+#define APC_PID_HELEN  0x0171 //NOTE: http://redmine.etron.com.tw/redmine/issues/6649#note-50
+#define APC_PID_SANDRA  0x0167
+
 #define APC_VID_GRAP_THERMAL 0x04b4
-//-[Thermal device]
 #define APC_VID_2170 0x0110
+#define APC_VID_EEVER 0x1e4e
+#define APC_VID_EYS3D 0x3438
 
 // for device selection information +
 typedef struct tagDEVSEL
@@ -441,6 +459,7 @@ typedef enum
 {
     USB_PORT_TYPE_2_0 = 2,
     USB_PORT_TYPE_3_0,
+    MIPI_PORT_TYPE,
     USB_PORT_TYPE_UNKNOW
 } USB_PORT_TYPE;
 
