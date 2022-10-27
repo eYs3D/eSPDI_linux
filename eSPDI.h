@@ -15,6 +15,10 @@
 #include "eSPDI_def.h"
 #include "eSPDI_version.h"
 #include <stdlib.h>
+
+#include <vector>
+#include <cstdint>
+
 extern "C" {
 
 /*! \fn int APC_Init(
@@ -1137,6 +1141,19 @@ int APC_GetDepthImageWithTimestamp(
 */
 int APC_SetupBlock(void *pHandleEYSD, PDEVSELINFO pDevSelInfo, bool enable);
 
+/*! \fn int APC_SetupContinueModek(
+        void *pHandleEYSD,
+        PDEVSELINFO pDevSelInfo,
+        bool enable)
+    \brief get color or depth pin image
+        by issuing V4L2's IOCTL to get frame data
+    \param void *pHandleEYSD	handle
+    \param PDEVSELINFO pDevSelInfo	pointer of device select index
+    \param bool enable Enable the MIPI clock continue mode or not)
+    \return success: APC_OK, others: see eSPDI_def.h
+*/
+int APC_SetupContinueMode(void *pHandleEYSD, PDEVSELINFO pDevSelInfo, bool enable);
+
 /*! \fn int APC_Get_Color_30_mm_depth(
         void *pHandleEYSD,
         PDEVSELINFO pDevSelInfo,
@@ -1225,6 +1242,38 @@ int  APC_Get2Image (void *pHandleEYSD, PDEVSELINFO pDevSelInfo,
                         BYTE *pColorImgBuf, BYTE *pDepthImgBuf,
                         unsigned long int *pColorImageSize, unsigned long int *pDepthImageSize,
                         int *pSerial = 0, int *pSerial2 = 0, int nDepthDataType =0);
+
+/*! \fn int APC_Get2ImageWithTimestampNoSplit(
+        void *pHandleEYSD,
+        PDEVSELINFO pDevSelInfo,
+        BYTE *pColorImgBuf,
+        BYTE *pDepthImgBuf,
+        unsigned long int *pColorImageSize,
+        unsigned long int *pDepthImageSize,
+        int *pColorSerial,
+        int *pDepthSerial,
+        int nDepthDataType)
+    \brief get color and/or depth pin images
+        see APC_GetImage for detailed description
+    \param void *pHandleEYSD	handle
+    \param PDEVSELINFO pDevSelInfo	pointer of device select index
+    \param BYTE *pBuf	buffer to store image
+    \param unsigned long int *pImageSize	the actual buffer size
+    \param int *pColorSerial	serial number
+    \param int nDepthDataType	the depth data type, see definition in eSPDI_def.h
+    \param int64_t *pcur_tv_sec seconds in 'v4l2_buffer' timestamp of this image data
+    \param int64_t *pcur_tv_usec microseconds in 'v4l2_buffer' timestamp of this image data
+    \return success: APC_OK, others: see eSPDI_def.h
+*/
+int APC_Get2ImageWithTimestampNoSplit(
+    void *pHandleEYSD,
+    PDEVSELINFO pDevSelInfo,
+    BYTE *pBuf,
+    unsigned long int *pImageSize,
+    int *pSerial,
+    int64_t *pcur_tv_sec,
+    int64_t *pcur_tv_usec,
+    bool bNeedToSvave);
 
 /*! \fn int APC_Get2ImageWithTimestamp(
         void *pHandleEYSD,
@@ -2877,6 +2926,29 @@ int APC_DecimationFilter(void *pDecimationFilterHandle, unsigned char *pDepthDat
  * @return APC_NullPtr when parameter is nullptr. APC_OK if no problem.
  */
 int APC_ReleaseDecimationFilter(void *pDecimationFilterHandle);
+
+/**
+ *
+ * @param ppResizeProcessHandle
+ * @param inWidth the pImageData width.
+ * @param inHeight the pImageData height.
+ * @param outWidth if user did not specify this value. We would fill in this value into inWidth * factor
+ * @param outHeight if user did not specify this value. We would fill in this value into inHeight * factor
+ * @param imageType Reference APCImageType for more info. Currently support APCImageType::COLOR_YUY2.
+ * @param factor greater than 1 is enlarge the image, otherwise shrink the image.
+ * @return APC_OK
+ */
+int APC_InitResizeProcess(void **ppResizeProcessHandle, size_t inWidth, size_t inHeight,
+                          size_t *outWidth, size_t *outHeight, APCImageType::Value imageType,
+                          float factor);
+
+int APC_ResizeProcess(void *pResizeProcessHandle, unsigned char *pImageData, unsigned char *resizedFrame,
+                      APCImageType::Value imageType);
+
+int APC_ResizeProcess(void *pResizeProcessHandle, const std::vector<uint8_t>& srcBuffer, std::vector<uint8_t>& dstBuffer,
+                      APCImageType::Value imageType);
+
+int APC_ReleaseResizeProcess(void *pResizeProcessHandle);
 
 /*! \fn int APC_SetRootCipher(void *pHandleEYSD, PDEVSELINFO pDevSelInfo, const char* cipher)
     \brief Set the correct root to do un-protect flash when writing parameters of camera.

@@ -308,12 +308,15 @@ typedef struct tagDEVINFORMATION {
 #define APC_PID_8063            0x0164
 #define APC_PID_8063_K          0x0165
 #define APC_PID_8076            0x0181
+#define APC_PID_8077            0x0182
+#define APC_PID_8081            0x0183
 #define APC_PID_IRIS            0x0184
 #define APC_PID_IVY             0x0177
 #define APC_PID_GRAP            0x0179
-#define APC_PID_GRAP_K          0x0183
+#define APC_PID_GRAP_K          0x0000
 #define APC_PID_GRAP_SLAVE      0x0279
 #define APC_PID_GRAP_SLAVE_K    0x0283
+#define APC_PID_BOOTLOADER      0x0668
 
 //+[Thermal device]
 #define APC_PID_GRAP_THERMAL    0xf9f9
